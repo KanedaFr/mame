@@ -112,6 +112,12 @@ void wswan_video_device::device_start()
 	}
 
 	common_save();
+
+	for (device_gfx_interface &gfxinf : gfx_interface_iterator(machine().root_device()))
+	{
+		gfx_element *m_gfx = gfxinf.gfx(0);
+		m_gfx->set_source(&m_vram[0] + 0x2000);
+	}
 }
 
 // This is a copy of ws_portram_init
