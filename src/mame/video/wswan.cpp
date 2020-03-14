@@ -115,7 +115,7 @@ void wswan_video_device::device_start()
 
 	for (device_gfx_interface &gfxinf : gfx_interface_iterator(machine().root_device()))
 	{
-		gfx_element *m_gfx = gfxinf.gfx(0);
+		m_gfx = gfxinf.gfx(0);
 		m_gfx->set_source(&m_vram[0] + 0x2000);
 	}
 }
@@ -1229,4 +1229,9 @@ uint8_t wswan_video_device::vram_r(offs_t offset)
 void wswan_video_device::vram_w(offs_t offset, uint8_t data)
 {
 	m_vram[offset] = data;
+
+	//tiles are stored at 0x2000
+	//each tile occupies 16 bytes
+	if (offset >= 0x2000)
+		m_gfx->mark_dirty( (offset-0x2000) /16 );
 }
