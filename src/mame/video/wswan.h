@@ -112,6 +112,7 @@ protected:
 	int m_main_palette[8];
 	emu_timer *m_timer;
 
+	gfx_element *m_gfx;					/* ws 2bpp gfx element */
 	std::vector<uint8_t> m_vram;
 	uint8_t *m_palette_vram;
 	uint8_t m_palette_port[0x20];
