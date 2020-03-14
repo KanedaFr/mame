@@ -44,7 +44,7 @@
 
 void wswan_state::wswan_mem(address_map &map)
 {
-	map(0x00000, 0x03fff).rw(m_vdp, FUNC(wswan_video_device::vram_r), FUNC(wswan_video_device::vram_w));       // 16kb RAM / 4 colour tiles
+	map(0x00000, 0x03fff).rw(m_vdp, FUNC(wswan_video_device::vram_r), FUNC(wswan_video_device::vram_w)).share("vram");       // 16kb RAM / 4 colour tiles
 	map(0x04000, 0x0ffff).noprw();       // nothing
 	//map(0x10000, 0xeffff)    // cart range, setup at machine_start
 	map(0xf0000, 0xfffff).r(FUNC(wswan_state::bios_r));
@@ -86,7 +86,20 @@ static INPUT_PORTS_START( wswan )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Y2 - Right") PORT_CODE(KEYCODE_D)
 INPUT_PORTS_END
 
+static const gfx_layout gfx2bppPlanar =
+{
+	8, 8,
+	0x200,
+	2,
+	{ 0, 8 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
+	8*16 //16bytes per tile
+};
+
+
 static GFXDECODE_START( gfx_wswan )
+	GFXDECODE_RAM("vram", 0, gfx2bppPlanar, 0, 1  )
 GFXDECODE_END
 
 /* WonderSwan can display 16 shades of grey */
