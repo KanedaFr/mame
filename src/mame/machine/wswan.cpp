@@ -237,7 +237,7 @@ uint8_t wswan_state::port_r(offs_t offset)
 	uint8_t value = m_ws_portram[offset];
 
 	if (offset != 2)
-		logerror("PC=%X: port read %02X\n", m_maincpu->pc(), offset);
+		LOGMASKED(LOG_IO, "PC=%X: port read %02X\n", m_maincpu->pc(), offset);
 
 	if (offset < 0x40 || (offset >= 0xa1 && offset < 0xb0))
 		return m_vdp->reg_r(offset);
@@ -300,7 +300,8 @@ void wswan_state::port_w(offs_t offset, uint8_t data)
 {
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	uint8_t input;
-	logerror("PC=%X: port write %02X <- %02X\n", m_maincpu->pc(), offset, data);
+
+	LOGMASKED(LOG_IO, "PC=%X: port write %02X <- %02X\n", m_maincpu->pc(), offset, data);
 
 	if (offset < 0x40 || (offset >= 0xa1 && offset < 0xb0))
 	{
@@ -354,7 +355,7 @@ void wswan_state::port_w(offs_t offset, uint8_t data)
 					dst++;
 				}
 #ifdef MAME_DEBUG
-				logerror("DMA  src:%X dst:%X length:%d\n", src, dst, length);
+				LOGMASKED(LOG_DEBUG, "DMA  src:%X dst:%X length:%d\n", src, dst, length);
 #endif
 				m_ws_portram[0x40] = src & 0xff;
 				m_ws_portram[0x41] = (src >> 8) & 0xff;
@@ -633,7 +634,7 @@ void wswan_state::port_w(offs_t offset, uint8_t data)
 			}
 			else
 			{
-				logerror( "Unsupported internal EEPROM command: %X\n", data );
+				LOGMASKED(LOG_DEBUG, "Unsupported internal EEPROM command: %X\n", data );
 			}
 			break;
 		case 0xc0:  // ROM bank $40000-$fffff
@@ -655,7 +656,7 @@ void wswan_state::port_w(offs_t offset, uint8_t data)
 			m_cart->write_io(offset & 0x0f, data);
 			break;
 		default:
-			logerror( "Write to unsupported port: %X - %X\n", offset, data );
+			LOGMASKED(LOG_DEBUG, "Write to unsupported port: %X - %X\n", offset, data );
 			break;
 	}
 

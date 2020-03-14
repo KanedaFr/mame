@@ -23,6 +23,13 @@
 #include "bus/wswan/rom.h"
 #include "emupal.h"
 
+#define LOG_ERROR	(1U<<1)
+#define LOG_DEBUG	(1U<<2)
+#define LOG_IO		(1U<<3)
+#define LOG_INT		(1U<<4)
+#define VERBOSE (LOG_ERROR|LOG_DEBUG)
+
+#include "logmacro.h"
 
 class wswan_state : public driver_device
 {

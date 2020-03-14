@@ -16,6 +16,7 @@
 #include "emu.h"
 #include "wswan.h"
 #include "screen.h"
+#include "includes/wswan.h"
 
 DEFINE_DEVICE_TYPE(WSWAN_VIDEO, wswan_video_device, "wswan_video", "Bandai WonderSwam VDP")
 
@@ -833,7 +834,7 @@ void wswan_video_device::refresh_scanline()
 				draw_foreground_0();
 				break;
 			case 1: // ???
-				logerror("Unknown foreground mode 1 set\n");
+				LOGMASKED(LOG_DEBUG, "Unknown foreground mode 1 set\n");
 				break;
 			case 2: // FG only inside window area
 				if (m_current_line >= m_window_fg_top && m_current_line <= m_window_fg_bottom)
@@ -942,12 +943,12 @@ void wswan_video_device::reg_w(offs_t offset, uint8_t data)
 			m_bg_control = data;
 			break;
 		case 0x02:  // Current scanline (Most likely read-only)
-			logerror("Write to current scanline! Current value: %d  Data to write: %d\n", m_current_line, data);
+			LOGMASKED(LOG_DEBUG, "Write to current scanline! Current value: %d  Data to write: %d\n", m_current_line, data);
 			// Returning so we don't overwrite the value here, not that it really matters
 			return;
 		case 0x03:  // Line compare
 			m_line_compare = data;
-			logerror("Write to line compare: %d\n", data);
+			LOGMASKED(LOG_DEBUG, "Write to line compare: %d\n", data);
 			break;
 		case 0x04:  // Sprite table base address
 					// Bit 0-5 - Determine sprite table base address 0 0xxxxxx0 00000000
@@ -956,7 +957,9 @@ void wswan_video_device::reg_w(offs_t offset, uint8_t data)
 			break;
 		case 0x05:  // First sprite number (the one we start drawing with)
 			m_sprite_first_latch = data;
-			if (data) logerror("non-zero first sprite %d\n", data);
+			if (data) {
+				LOGMASKED(LOG_DEBUG, "non-zero first sprite %d\n", data);
+			}
 			break;
 		case 0x06:  // Number of sprites to draw
 			m_sprite_count_latch = data;
@@ -1157,7 +1160,7 @@ void wswan_video_device::scanline_interrupt()
 	if (m_timer_hblank_enable && m_timer_hblank_reload != 0)
 	{
 		m_timer_hblank_count--;
-		logerror("timer_hblank_count: %X\n", m_timer_hblank_count);
+		LOGMASKED(LOG_INT, "timer_hblank_count: %X\n", m_timer_hblank_count);
 		if (m_timer_hblank_count == 0)
 		{
 			if (m_timer_hblank_mode)
@@ -1165,7 +1168,7 @@ void wswan_video_device::scanline_interrupt()
 			else
 				m_timer_hblank_reload = 0;
 
-			logerror( "triggering hbltmr interrupt\n" );
+			LOGMASKED(LOG_INT, "triggering hbltmr interrupt\n" );
 			m_set_irq_cb(WSWAN_VIDEO_IFLAG_HBLTMR);
 		}
 	}
@@ -1189,7 +1192,7 @@ void wswan_video_device::scanline_interrupt()
 		if (m_timer_vblank_enable && m_timer_vblank_reload != 0)
 		{
 			m_timer_vblank_count--;
-			logerror("timer_vblank_count: %X\n", m_timer_vblank_count);
+			LOGMASKED(LOG_INT, "timer_vblank_count: %X\n", m_timer_vblank_count);
 			if (m_timer_vblank_count == 0)
 			{
 				if (m_timer_vblank_mode)
@@ -1197,7 +1200,7 @@ void wswan_video_device::scanline_interrupt()
 				else
 					m_timer_vblank_reload = 0;
 
-				logerror("triggering vbltmr interrupt\n");
+				LOGMASKED(LOG_INT, "triggering vbltmr interrupt\n");
 				m_set_irq_cb(WSWAN_VIDEO_IFLAG_VBLTMR);
 			}
 		}
